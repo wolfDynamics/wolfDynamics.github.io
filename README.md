@@ -1,2 +1,2 @@
-# joelguerrero.github.io
+# wolfDynamics.github.io
 github page
