@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>dc.js - Dimensional Charting Javascript Library</title>
+
+    <meta charset="UTF-8">
+    <meta name="description" content="D3.JS tutorial">
+    <meta name="keywords" content="HTML,CSS,XML,JavaScript">
+    <meta name="author" content="joegi">
+
+    
+    
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.5/dc.css"> -->
+    <!-- <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"> -->
+    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script> -->
+	<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.min.js"></script> -->
+    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.js"></script> -->
+    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dc/1.7.5/dc.js"></script> -->
+
+	<link rel="stylesheet" type="text/css" href="css/dc.css"/>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <script type="text/javascript" src="js/jquery-2.1.4.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/d3.min.js"></script>
+    <script type="text/javascript" src="js/crossfilter.min.js"></script>
+    <script type="text/javascript" src="js/dc.min.js"></script>
+    <script type="text/javascript" src="js/FileSaver.js"></script>
+
+    <script type="text/javascript" src="js/colorbrewer.js"></script>
+
+
+
+
+
+
+    <style>
+        .jumbotron 
+        {
+            /*background-color: white;*/ 
+            margin-bottom: 40px;
+            margin-top: 60px;  
+            padding-bottom: 20px;
+            padding-top: 5px;
+        }
+
+        /*do not shot y axis of this chart*/
+        #monthly-volume-chart g.y
+        {
+            display: none;
+        }
+
+        #monthly-move-chart g.y
+        {
+            display: none;
+        }
+
+        #year-chart g.y
+        {
+            display: none;
+        }
+
+        #year-chart g.x path
+        {
+            display: none;
+        }
+
+		/*        
+		#year-chart g.y,
+        {
+            display: none;
+        }
+        */
+
+        /*text of row chart*/
+        .dc-chart g.row text 
+        {
+            fill: black;
+        }
+
+        /*text of bar chart*/
+        /*
+        .dc-chart g.row text 
+        {
+            fill: black;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        */
+
+        /*
+        .dc-chart .bubble 
+        {
+            stroke: none;
+            fill-opacity: 0.5;
+        }
+        */
+
+        /*selection rectangle
+        .dc-chart .brush rect.extent {
+            fill: steelblue;
+            fill-opacity: .125;
+        }
+        */
+
+
+        /*background of each div*/
+        .chart_bg
+        {
+        	
+            background-color: #F5F2EB;
+            border: 1px solid black;
+            
+        }
+
+        /*
+        #flight-table
+        .early 
+        .dc-data-table
+        {
+            color: green;
+        }
+		*/
+		
+        
+        .table-hover tbody tr:hover td,
+        .table-hover tbody tr:hover th 
+        {
+            background-color: PaleTurquoise;
+        }
+        
+        
+        /*        
+        #logo {
+            margin-right: 2em;
+            margin-top: 2em;
+        }
+        */
+
+    </style>
+</head>
+
+
+
+
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+<!-- <nav class="navbar navbar-inverse navbar-fixed-top"> -->
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"> <strong><span style="color:Purple"> Interactive dashboard </span></strong>
+                <!-- <img alt="Brand" src="dae.png" width="50%" height="50%">  -->
+                <!-- <img alt="Brand" src="dae.png" width="50%" height="50%"> --> 
+            </a>
+            <!-- <a type="button" class="btn btn-warning btn-md navbar-btn" href="javascript:dc.filterAll();dc.redrawAll();">Reset all charts</a> -->
+        </div>
+
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <a type="button" class="btn btn-warning btn-md navbar-btn" href="javascript:dc.filterAll();dc.redrawAll();">Reset all charts</a>
+            <ul class="nav navbar-nav">
+                <!-- <li class="active"><a href="#">Home</a></li> -->
+                <li><a href="#">Go to top</a></li>
+                <li><a href="#bottom">Go to bottom</a></li>
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Navigate to chart
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#chart-bar1">Total number of flights per day of the month</a></li>
+                        <li><a href="#chart-bar2">Departure delay & Arrival delay</a></li>
+                        <li><a href="#chart-bar5">Departure time & Distance between airports</a></li>
+                        <li><a href="#chart-pie1">Number of arrivals per airport</a></li>
+                        <li><a href="#flight-table">List of all flights filtered</a></li>    
+                    </ul>
+                </li> 
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+<!-- <div class="container-fluid"> -->
+<div class="container">
+
+    <div class="jumbotron">
+        <h1 align="center">US Airline performance dashboard</h1>
+    	<h4 align="center">Period: April 2016</h4>
+        <h6 align="center">Source: http://www.transtats.bts.gov/ </h6>
+    </div>
+
+
+
+    <div class="row" style="margin-top:0px">
+        <div  style="font-size:20px;" class="dc-data-count">
+            <span class="filter-count "></span> selected out of <span class="total-count"></span> records |
+                <a id="all" href="javascript:dc.filterAll();dc.redrawAll();">Reset All</a>
+            </span>
+        </div>
+    </div>  
+
+
+
+    <div>
+        <p></p>
+    </div>
+
+
+    
+    <div class="row" style="margin-top:-10px">
+    <hr style="margin-bottom:6px">
+        <div id="chart-bar1" class="dc-chart chart_bg col-md-8" align="left" >
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the graph and select a range to filter">Total number of flights per day of the month</strong>  
+            <span class="reset" style="display: none;">  | Range: <span class="filter"></span></span>
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:barChart1.filterAll();dc.redrawAll();" >Reset chart</a> 
+            <!-- <h6 class="text-muted">Departure delta refers to the difference in minutes between scheduled and actual departure time. Early departures show negative numbers.</h6> -->
+            <div class="clearfix"></div>
+        </div>
+
+        <div id="chart-row1" class="dc-chart chart_bg col-md-4" align="left" >
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the graph and select a range to filter">Number of flights by day of the week</strong>  
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:rowChart1.filterAll();dc.redrawAll();" >Reset chart</a> 
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+    
+
+
+    <div class="row" style="margin-top:-10px">
+    <hr style="margin-bottom:6px">
+        <div id="chart-bar2" class="dc-chart chart_bg col-md-6" align="left" >
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the graph and select a range to filter">Departure delay (minutes)</strong>  
+            <span class="reset" style="display: none;">  | Range: <span class="filter"></span></span>
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:barChart2.filterAll();dc.redrawAll();" >Reset chart</a> 
+            <div class="clearfix"></div>
+        </div>
+
+        <div id="chart-bar3" class="dc-chart chart_bg col-md-6" align="left" >
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the graph and select a range to filter">Arrival delay (minutes)</strong>  
+            <span class="reset" style="display: none;">  | Range: <span class="filter"></span></span>
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:barChart3.filterAll();dc.redrawAll();" >Reset chart</a> 
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+
+    <div class="row" style="margin-top:-10px">
+        <div class="chart_bg col-md-6" align="left" >
+            <h6 class="text-muted">Departure delay refers to the difference in minutes between scheduled and actual departure time. Early departures show negative numbers.</h6>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="chart_bg col-md-6" align="left" >
+            <h6 class="text-muted">Arrival delay refers to the difference in minutes between scheduled and actual arrival time. Early arrivals show negative numbers.</h6>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+
+
+    <div class="row" style="margin-top:-10px">
+    <hr style="margin-bottom:6px">
+        <div id="chart-bar4" class="dc-chart chart_bg col-md-6" align="left" >
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the graph and select a range to filter">Departure time (hours)</strong>  
+            <span class="reset" style="display: none;">  | Range: <span class="filter"></span></span>
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:barChart4.filterAll();dc.redrawAll();" >Reset chart</a> 
+            <!-- <h6 class="text-muted">Departure time refers to the actual departure hour.</h6> -->
+            <div class="clearfix"></div>
+        </div>
+
+        <div id="chart-bar5" class="dc-chart chart_bg col-md-6" align="left" >
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the graph and select a range to filter">Distance between airports (miles)</strong>  
+            <span class="reset" style="display: none;">  | Range: <span class="filter"></span></span>
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:barChart5.filterAll();dc.redrawAll();" >Reset chart</a> 
+            <!-- <h6 class="text-muted">Departure time refers to the actual departure hour.</h6> -->
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+
+    <div class="row" style="margin-top:-10px">
+        <div class="chart_bg col-md-6" align="left" >
+            <h6 class="text-muted">Departure time refers to the actual departure hour.</h6>
+            <div class="clearfix"></div>
+        </div>
+
+        <div class="chart_bg col-md-6" align="left" >
+            <h6 class="text-muted">Distance between airports of more than 2000 miles is accumulated in the last bar.</h6>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+
+
+
+    <div class="row" style="margin-top:-10px">
+    <hr style="margin-bottom:6px">
+        <div id="chart-pie1" class="dc-chart chart_bg col-md-6" align="center" style="margin-left:0px">
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the donut chart or the legend to filter data">Number of arrivals per airport (on destination)</strong>  
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:pieChart1.filterAll();dc.redrawAll();" >Reset chart</a>
+            <div class="clearfix"></div>
+        </div>
+
+        <div id="chart-pie2" class="dc-chart chart_bg col-md-6" align="center" style="margin-left:0px">
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the donut chart or the legend to filter data">US Carrier</strong>  
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:pieChart2.filterAll();dc.redrawAll();" >Reset chart</a>
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+
+<!--
+    <div class="row" style="margin-top:0px">
+    <hr style="margin-bottom:6px">
+        <div id="chart-pie1" class="dc-chart chart_bg col-md-8" align="center" style="margin-left:0px">
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the donut chart or the legend to filter data">Number of arrivals per airport</strong>  
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:pieChart1.filterAll();dc.redrawAll();" >Reset chart</a>
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+
+
+
+    <div class="row" style="margin-top:0px">
+    <hr style="margin-bottom:6px">
+        <div id="chart-pie2" class="dc-chart chart_bg col-md-8" align="center" style="margin-left:0px">
+            <strong data-toggle="tooltip" data-placement="top" title="Click on the donut chart or the legend to filter data">US Carrier</strong>  
+            <a class="btn btn-primary btn-sm" style="margin-left: 20px;" href="javascript:pieChart2.filterAll();dc.redrawAll();" >Reset chart</a>
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+-->
+
+
+
+
+
+    <div class="row" style="margin-top:40px">
+    <hr style="margin-bottom:6px">   
+
+
+    <div>
+        <a class="btn btn-primary" style="margin-left: 0px; margin-bottom: 20px;" id="download">Download table</a>
+    </div>   
+
+
+        <div>
+            <div class="dc-data-count1">
+                    <span class="filter-count"></span> selected out of <span class="total-count"></span> records | <a
+                    href="javascript:dc.filterAll(); dc.renderAll();">Reset All</a>
+            </div>
+        </div> 
+
+        <table class="table table-hover table-striped dc-data-table" id="flight-table">
+            <thead>
+                <tr class="header">         
+                    <th>Date</th>
+                    <th>Departure time</th>
+                    <th>Departure Airport</th>
+                    <th>Arrival airport</th>
+                    <th>Distance</th>
+                    <th>Delay at arrival</th>    
+                </tr>
+            <tbody>
+                <tr>
+                </tr>
+            </tbody>
+            </thead>
+        </table>
+    </div>  
+
+
+
+
+
+    <div class="row">
+    <hr style="margin-bottom:6px">
+        <div id="bottom">
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+
+
+    <!--       
+    <div class="row">
+        <p> DC.js version <span id="version"> </span></p>
+        <div class="clearfix"></div>
+    </div> 
+    -->
+
+
+
+    <footer class="text-center" id="footer">
+        <div class="container">
+            <a class="up-arrow" href="#" title="Go to top">
+             	<!-- #5cb85c brand-primary for bootstrap blue -->
+                <span style="font-size:4em; color:purple;" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+            <br>
+            <!-- <p>Made with Bootstrap</p> -->
+            <!-- <p>I will display &#x2660;<p>  -->
+        </div>
+    </footer>
+
+
+
+    <div class="clearfix"></div>
+
+</div>
+
+
+
+
+<script type="text/javascript" src="script1.js"></script>
+
+   	<script>
+        $(document).ready(function()
+        {
+            //$('[data-toggle="tooltip"]').tooltip({delay:{show: 0, hide: 500}});   //enable bootstrap tooltips
+            $('[data-toggle="tooltip"]').tooltip();   //enable bootstrap tooltips
+
+            //$('#flight-table').dataTable();
+
+            drawChart()
+        });
+    </script>
+
+
+
+</body>
+</html>
