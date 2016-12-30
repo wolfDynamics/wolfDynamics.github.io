@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<!--To definelanguage attribute-->  
+<html lang="en">
+<!--<html>--> 
+<!--To definelanguage attribute-->  
+
+<head>
+
+<!-- Example based on http://bl.ocks.org/mbostock/3887118 -->
+<!-- Tooltip example from http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html -->
+
+<!--
+Metadata is used by browsers (how to display content), by search engines (keywords), and other web services.
+-->
+  <meta charset="UTF-8">
+  <meta name="description" content="Free Web tutorials">
+  <meta name="keywords" content="HTML,CSS,XML,JavaScript">
+  <meta name="author" content="joegi">
+<!--
+Metadata is used by browsers (how to display content), by search engines (keywords), and other web services.
+-->
+
+    <title>D3.JS linear regression</title>
+
+
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.min.js"></script> -->
+    <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-statistics/1.0.0/simple_statistics.min.js"></script>
+
+
+
+    <link rel="stylesheet" href="css/main.css">
+    <!-- <script type="text/javascript" src="d3/d3.min.js"></script> -->
+    <!--For tooltips. more info in http://labratrevenge.com/d3-tip/-->  
+    <!-- <script src="d3-tip/tooltip.js"></script> -->
+    <!-- <script src="d3-simple_statistics/simple_statistics.min.js"></script> -->
+
+
+
+
+<style>
+
+    .jumbotron 
+    {
+        /*background-color: white;*/ 
+        margin-bottom: 40px;
+        margin-top: 60px;  
+        padding-bottom: 20px;
+        padding-top: 5px;
+    }
+
+</style>
+
+</head>
+
+<body>
+<!--Place all DOM elements here -->
+
+
+<script src="linearegressionChart.js"></script> 
+
+<script>
+//Write your code here
+var small_multiples = "yes"; //yes or no
+var fix_body_length = "no"; //yes or no
+
+
+//Set this value to yes if you want to pair neighbour columns. 
+//i.e., plot column 1 vs column 2, column 3 vs column 4, column 5 vs column 6, and so on.
+//Otherwise leave it to "no". Useful to plot anscombe quartet (yes).
+var pair_neighbour_columns = "no";
+
+
+//These options will fix the body width and number of columns
+if (fix_body_length == "yes")
+{
+    var body_width  = 1200;
+    var svg_per_row = 3;
+    //document.body.style.width = "800px";
+    //$("body").css("width", "800px");
+    $("body").css("width", body_width);
+
+    var width = body_width / svg_per_row;
+    var aspect_ratio = 1; //height-to-width
+    var height = width * aspect_ratio;
+}
+
+myOptions = {
+    // responsive: "yes",
+    width: 400,
+    height: 400,
+    // width: width, 
+    // height: height,
+    // margintop: 20,
+    // marginbottom: 60,
+    // marginleft: 60,
+    // marginright: 10,
+    // chart_background: "white",
+    // chart_border: "no",
+    // column_x: 0,
+    // column_y: 2,
+    // column_c: 0,      //for circles
+    // column_s: 0,      //for circles
+    // column_t: 1,      
+    // xOffset: 60,
+    // yOffset: 20,
+    // shift_ax: 30,
+    // shift_ay: 30,
+    // legend_x: 0,
+    // legend_y: 0,
+    // text_padding_axx: 250,
+    // text_padding_axy: 35,
+    // text_padding_ayx: 60,
+    // text_padding_ayy: 120,
+    // show_title: "yes",
+    // title_auto_label: "no",
+    // title_label: "Chart title",
+    // title_x: 300,
+    // title_y: 20,
+    // gap: 1,
+    // xaxis_auto_scale: "no",
+    // xMin: 0,
+    // xMax: 20,
+    // yaxis_auto_scale: "no",
+    // yMin: 3,
+    // yMax: 13,
+    // xdelta: 1,
+    // ydelta: 1,
+    // xa_show_legend: "yes",
+    // xa_auto_legend: "no",
+    // xa_legend: "This is a manual legend",
+    // ya_show_legend: "yes",
+    // ya_auto_legend: "no",
+    // ya_legend: "This is a manual legend",
+    // regline_color: "crimson",
+    // regline_width: 2,
+    // regline_dash: (8,8),             //(10,10), (0,0) continuous
+    // transition_duration: 2000,
+    // transition_delay: 0,
+    // ax_f: ".2f",
+    // ay_f: ".2f",
+    // x_ticks: 5,
+    // y_ticks: 5,
+    // axes_font_size: 8,
+    // enable_tooltip: "yes",
+    // tooltip_f: ".4f",
+    // show_statistics: "no",
+    // show_regression_stats: "no",
+    // text_stats_padding: 20,
+    // circle_color: "LawnGreen",        //lime, steelblue,orange
+    // circle_size: 5,
+    // circle_opacity: 0.5,
+    // gridlines_x: "yes",
+    // gridlines_y: "yes",
+    plot_frame: "yes",                  //frame and add clipping
+    // black_and_white: "yes",
+}
+
+//To clone myOptions.  Doing options2 = options1 does not work
+var options1 = jQuery.extend(true,{}, myOptions); //clone object
+//options1.column_x = 2;
+
+
+//"dace1_csv.csv"
+//"dace2_csv.csv"
+//"dace700_csv.csv"
+//"ea1200_csv.csv"
+//"new.csv"
+input_file = "datasets/dace2_csv.csv"
+
+//=========================================================================================================
+//jQuery
+$(document).ready(function()
+{
+    //Begin read csv
+    //load data
+    d3.csv(input_file, function(error, inputdata)
+
+    {
+        //=========================================================================================================
+
+        if (small_multiples == "yes")
+        {
+            var iter = d3.keys(inputdata[0]).length;
+            //console.log(d3.keys(inputdata[0]).length)
+            //console.log(iter % 2 == 0)
+
+            if (pair_neighbour_columns == "yes")
+            {
+                if (iter % 2 == 0) //if it is even
+                {
+                    for (var i = 0; i < iter; i += 2)
+                    {
+                        options1.column_x = i;
+                        options1.column_y = i + 1;
+                        var myChart = linearRegressionChart(inputdata, options1);
+                    };
+                }
+                else //else if it is odd
+                {
+                    for (var i = 0; i < iter - 1; i += 2)
+                    {
+                        options1.column_x = i;
+                        options1.column_y = i + 1;
+                        var myChart = linearRegressionChart(inputdata, options1);
+                    };
+
+                    options1.column_x = iter - 2;
+                    options1.column_y = iter - 1;
+                    var myChart = linearRegressionChart(inputdata, options1);
+                }
+            }
+            else
+            {
+                for (var i = 1; i < iter; i++)
+                {
+                    //options1.column_x = 1;
+                    options1.column_y = i;
+                    var myChart = linearRegressionChart(inputdata, options1);
+                };
+            }
+        }
+        else
+        {
+            var myChart = linearRegressionChart(inputdata, options1);
+            //var myChart = lineChart(inputdata,options2);
+            //var myChart = lineChart(inputdata,{id1:"myChart2"},{column_y:2, responsive:"yes"});  
+        }
+
+        //=========================================================================================================================
+    });
+    //End read csv
+
+
+
+}); //close jQuery
+//=========================================================================================================================
+</script>
+
+
+
+
+<nav class="navbar navbar-default navbar-fixed-top">
+<!-- <nav class="navbar navbar-inverse navbar-fixed-top"> -->
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"> <strong><span style="color:Purple"> DAE Charting library </span></strong>
+                <!-- <img alt="Brand" src="dae.png" width="50%" height="50%">  -->
+                <!-- <img alt="Brand" src="dae.png" width="50%" height="50%"> --> 
+            </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <!-- <li class="active"><a href="#">Home</a></li> -->
+                <li><a href="#"> <span style="color:black">Go to top </span></a></li>
+                <li><a href="#bottom"> <span style="color:black">Go to bottom </span> </a></li>
+                <!--              
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Navigate to chart
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#chart-bar1">Total number of flights per day of the month</a></li>
+                        <li><a href="#chart-bar2">Departure delay & Arrival delay</a></li>
+                        <li><a href="#chart-bar5">Departure time & Distance between airports</a></li>
+                        <li><a href="#flight-table">List of all flights filtered</a></li>
+                    </ul>
+                </li>  
+                -->
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+<!-- <div class="container-fluid"> -->
+<div class="container">
+
+    <div class="jumbotron">
+        <h1 align="center">Regression + Scatter plot</h1>
+        <!-- <h4 align="center">DAE4CFD Charting library</h4> -->
+        <!-- <h6 align="center">Source: http://www.transtats.bts.gov/ </h6> -->
+    </div>
+
+
+    <div class="row" style="margin-top:-20px">
+    <!-- <hr style="margin-bottom:10px"> -->
+    <hr style="height:1px; background-color:black; margin-bottom:20px" />
+        <!-- <div id="myChart" class="chart_bg col-md-10" align="left" style="background-color:lavender"> -->
+        <div id="myChart" class="chart_bg col-md-10" align="left" >
+            <!-- <h6 class="text-muted">Departure delta refers to the difference in minutes between scheduled and actual departure time. Early departures show negative numbers.</h6> -->
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+
+
+
+    <div class="row">
+    <!-- <hr style="margin-bottom:6px"> -->
+    <hr style="height:1px; background-color:black; margin-bottom:20px" />
+        <div id="bottom">
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+
+
+    <footer class="text-center" id="footer">
+        <div class="container">
+            <a class="up-arrow" href="#" title="Go to top">
+                <!-- #5cb85c brand-primary for bootstrap blue -->
+                <span style="font-size:4em; color:purple;" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+            <br>
+            <!-- <p>Made with Bootstrap</p> -->
+            <!-- <p>I will display &#9829;<p>  -->
+        </div>
+    </footer>
+
+
+</div> 
+
+
+
+<!-- <div class="container-fluid">
+    <div class="col-md-12" id="myChart" style="background-color: rgba(245, 245, 245, 0);">
+
+    </div>
+</div> -->
+
+
+
+</body>
+</html>
