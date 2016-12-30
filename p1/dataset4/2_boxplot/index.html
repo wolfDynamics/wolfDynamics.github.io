@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<!--To definelanguage attribute-->	
+<html lang="en">
+<!--<html>-->	
+<!--To definelanguage attribute-->	
+
+<head>
+
+<!--
+Metadata is used by browsers (how to display content), by search engines (keywords), and other web services.
+-->
+<meta charset="UTF-8">
+<meta name="description" content="Free Web tutorials">
+<meta name="keywords" content="HTML,CSS,XML,JavaScript">
+<meta name="author" content="joegi">
+<!--
+Metadata is used by browsers (how to display content), by search engines (keywords), and other web services.
+-->
+
+<title>D3.JS boxplot</title>
+
+
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.9/d3.min.js"></script> -->
+	<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+	<script type="text/javascript" src="https://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+
+	<link rel="stylesheet" href="css/main.css" >
+	<!-- <script type="text/javascript" src="d3/d3.min.js"></script> -->
+	<!--For tooltips. more info in http://labratrevenge.com/d3-tip/-->	
+	<!-- <script src="d3-tip/tooltip.js"></script> -->
+
+
+
+<style>
+
+    .jumbotron 
+    {
+	    /*background-color: white;*/ 
+	    margin-bottom: 40px;
+	    margin-top: 60px;  
+	    padding-bottom: 20px;
+	    padding-top: 5px;
+    }
+
+</style>
+
+</head>
+
+
+
+<body>
+<!--Place all DOM elements here -->
+
+<script src="boxplot.js"></script> 
+
+<script>
+//Write your code here
+var small_multiples = "yes" //yes or no
+var fix_body_length = "no" //yes or no
+
+//These options will fix the body width and number of columns
+//If yes it will give problem with the container of bootstrap
+if (fix_body_length == "yes")
+{
+    var body_width = 800
+    var svg_per_row = 2
+    //document.body.style.width = '800px';
+    //$('body').css('width', '800px');
+    $('body').css('width', body_width);
+
+    var width = body_width / svg_per_row - 5
+    var aspect_ratio = 0.5 //height-to-width
+    var height = width * aspect_ratio
+}
+
+myOptions = {
+	// responsive: "yes",
+	width: 400,
+	height: 200,
+	// width: width, 
+	// height: height,
+	// margintop: 20,
+	// marginbottom: 20,
+	// marginleft: 30,
+	// marginright: 20,
+	// chart_background: "white",
+	// chart_border: "no",
+	column_sample: 17,
+	// log_sample: "yes",
+	// column_t: column_sample,
+	// xOffset: 10,
+	// yOffset: 0,
+	// xa_start: 0,
+	// ya_start: 0,
+	// shift_ax: 0,
+	// shift_ay: 0,
+	// legend_x: 0,
+	// legend_y: 0,
+	// text_padding_axx: 250,
+	// text_padding_axy: 35,
+	// text_padding_ayx: 50,
+	// text_padding_ayy: 200,
+	// title_x: 180,
+	// title_y: 20,
+	// show_title: 'yes',
+	// title_auto_label: 'no',
+	// title_label: 'Boxplot',
+	// shift_box: -5,
+	// midline: 60, 							//height / 2 + shift_box Better to let it compute automatically
+	cir_r: 3,
+	// cir_magnification: 5,
+	outlier_r: 3,
+	// cir_opacity: 0.6,
+	// outlier_opacity: 0.6,
+	// cir_color: "LawnGreen",					//lime, navy overwrite css
+	// outlier_color: "blue",					//"crimson",
+	// whiskerheight: 30,
+	// boxheight: 60,
+	// medianheight: 30, 						//boxheight / 2,
+	// meanheight: 30, 							//boxheight / 2,
+	// jitter: "yes",							//yes or no
+	// jitter_width: 20,
+	// draw_mean_line: "no",
+	// mean_line_color: "black",
+	// median_line_color: "magenta",
+	// quartiles_line_color: "orange",
+	// quartiles_line_width: 1,
+	// mean_line_width: 1,
+	// median_line_width: 1,
+	// box_color: "lightsteelblue",
+	// show_only_outliers: "yes",
+	// bl_color: "teal",
+	// bl_dy: "15px",
+	// bl_dy1: "-6px",
+	// bl_fs: "10px",
+	// bl_f: " ",								//" ",".2f"
+	// sbpl: "yes",
+	// a_f: ".d",								//.d, .2f
+	// xa_show_legend: "yes",
+	// xa_auto_legend: "yes",
+	// xa_legend: "This is a manual legend",
+	// axes_font_size: 10,
+	// x_ticks: 5,
+	// enable_tooltip: "yes",
+	// tooltip_f: ".2f",
+	// enable_transition: "yes",
+	// transition_color: "orange",		
+	// transition_duration: 250,	
+	// black_and_white: "yes",
+}
+
+
+//To clone myOptions.  Doing options2 = options1 does not work
+var options1 = jQuery.extend(true, {}, myOptions); 	//clone object
+//options1.column_s = 2;							//access column_s and change its value
+
+
+//input_file = "./datasets/bacterial_response_old.csv"
+input_file = "./datasets/sa.csv"
+
+
+//=========================================================================================================
+//jQuery
+$(document).ready(function()
+{
+	//Begin read csv
+	d3.csv(input_file, function(error, inputdata)
+
+	{
+		if (small_multiples == "yes")
+		{
+			//console.log(d3.keys(inputdata[0]).length)
+            var iter = d3.keys(inputdata[0]).length;
+            iter = 20;
+
+			for (var i = 17; i < iter; i++)
+			{
+				options1.column_sample = i;
+				var myChart = boxplotChart(inputdata, options1);
+			};
+		}
+		else
+		{
+			var myChart = boxplotChart(inputdata, options1);
+			//var myChart = lineChart(inputdata,options2);
+			//var myChart = lineChart(inputdata,{id1:"myChart2"},{column_y:2, responsive:"yes"});  
+		};
+
+	//=========================================================================================================================
+	});
+	//End read csv
+
+
+
+}); //close jQuery
+//=========================================================================================================================
+</script>	
+
+
+
+<nav class="navbar navbar-default navbar-fixed-top">
+<!-- <nav class="navbar navbar-inverse navbar-fixed-top"> -->
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"> <strong><span style="color:Purple"> DAE Charting library </span></strong>
+                <!-- <img alt="Brand" src="dae.png" width="50%" height="50%">  -->
+                <!-- <img alt="Brand" src="dae.png" width="50%" height="50%"> --> 
+            </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav">
+                <!-- <li class="active"><a href="#">Home</a></li> -->
+                <li><a href="#"> <span style="color:black">Go to top </span></a></li>
+                <li><a href="#bottom"> <span style="color:black">Go to bottom </span> </a></li>
+   				<!--              
+   				<li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">Navigate to chart
+                    <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#chart-bar1">Total number of flights per day of the month</a></li>
+                        <li><a href="#chart-bar2">Departure delay & Arrival delay</a></li>
+                        <li><a href="#chart-bar5">Departure time & Distance between airports</a></li>
+                        <li><a href="#flight-table">List of all flights filtered</a></li>
+                    </ul>
+                </li>  
+                -->
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+<!-- <div class="container-fluid"> -->
+<div class="container">
+
+    <div class="jumbotron">
+        <h1 align="center">Box-and-whiskers plot (boxplot)</h1>
+    	<!-- <h4 align="center">DAE4CFD Charting library</h4> -->
+        <!-- <h6 align="center">Source: http://www.transtats.bts.gov/ </h6> -->
+    </div>
+
+
+    <div class="row" style="margin-top:-20px">
+    <!-- <hr style="margin-bottom:10px"> -->
+    <hr style="height:1px; background-color:black; margin-bottom:20px" />
+        <!-- <div id="myChart" class="chart_bg col-md-10" align="left" style="background-color:lavender"> -->
+        <div id="myChart" class="chart_bg col-md-10" align="left" >
+            <!-- <h6 class="text-muted">Departure delta refers to the difference in minutes between scheduled and actual departure time. Early departures show negative numbers.</h6> -->
+            <div class="clearfix"></div>
+        </div>
+    </div> 
+
+
+
+    <div class="row">
+    <!-- <hr style="margin-bottom:6px"> -->
+    <hr style="height:1px; background-color:black; margin-bottom:20px" />
+        <div id="bottom">
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+
+
+    <footer class="text-center" id="footer">
+        <div class="container">
+            <a class="up-arrow" href="#" title="Go to top">
+             	<!-- #5cb85c brand-primary for bootstrap blue -->
+                <span style="font-size:4em; color:purple;" class="glyphicon glyphicon-chevron-up"></span>
+            </a>
+            <br>
+            <!-- <p>Made with Bootstrap</p> -->
+            <!-- <p>I will display &#9829;<p>  -->
+        </div>
+    </footer>
+
+
+</div> 
+
+
+
+<!-- <div class="container-fluid">
+	<div class="col-md-12" id="myChart" style="background-color: rgba(245, 245, 245, 0);">
+
+	</div>
+</div> -->
+
+
+
+
+
+
+</body>
+</html>
