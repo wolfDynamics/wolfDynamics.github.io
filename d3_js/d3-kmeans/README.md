@@ -1,4 +1,4 @@
-# Visualization of the k-means clustering algorithm in D3.js
+# k-means clustering using D3.js and javascript
 ============================================================
 
 
@@ -18,7 +18,6 @@ See the algorithm in action [here](http://nl-hugo.github.io/d3-kmeans/index.html
 
 ## Source Code Layout
 
-    media\				media files
     kmeans.css          CSS stylesheet
     index.html          webpage demonstrating the algorithm
     kmeans.js           JavaScript file with the source code for the algorithm visualization
@@ -27,7 +26,7 @@ See the algorithm in action [here](http://nl-hugo.github.io/d3-kmeans/index.html
 
 ## Raw Data
 
-Data are randomly generated x,y-coordinates between 0 and the width/height of 
+Data are randomly generated x, y-coordinates between 0 and the width/height of 
 the canvas.
 
 
