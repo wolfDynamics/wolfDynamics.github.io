@@ -509,7 +509,7 @@ function drawChart()
             // Specify a "range chart" to link its brush extent with the zoom of the current "focus chart".
             .rangeChart(volumeChart)
             .mouseZoomable(true)
-            .x(d3.time.scale().domain([new Date(1985, 0, 1), new Date(2015, 11, 31)]))
+            .x(d3.time.scale().domain([new Date(1985, 10, 1), new Date(2016, 12, 31)]))
             .round(d3.time.month.round)
             .xUnits(d3.time.months)
             //.colors(colorbrewer.Dark2[7])
@@ -518,7 +518,7 @@ function drawChart()
             .renderVerticalGridLines(false)
             //.legend(dc.legend().x(80).y(20).itemHeight(14).gap(5))
             .legend(dc.legend().x(80).y(20).itemHeight(13).gap(5))
-            .brushOn(false)
+            .brushOn(true)
             // Add the base layer of the stack with group. The second parameter specifies a series name for use in the
             // legend.
             // The `.valueAccessor` will be used for the base layer
@@ -567,7 +567,9 @@ function drawChart()
             .transitionDuration(transition_time)
             .centerBar(true)
             .gap(1)
-            .x(d3.time.scale().domain([new Date(1985, 0, 1), new Date(2015, 11, 31)]))
+            .x(d3.time.scale().domain([new Date(1985, 10, 1), new Date(2016, 12, 31)]))
+            //.gap(4)
+            //.x(d3.time.scale().domain([new Date(2010, 10, 1), new Date(2016, 12, 31)]))
             .round(d3.time.month.round)
             .alwaysUseRounding(true)
             .xUnits(d3.time.months);
